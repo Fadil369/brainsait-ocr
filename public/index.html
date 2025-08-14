@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainSAIT OCR - قارئ الوثائق الذكي المتقدم</title>
+    <meta name="description" content="أفضل خدمة OCR للنصوص العربية - دقة فائقة، معالجة سريعة، وتكامل مع الذكاء الاصطناعي">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .rtl { direction: rtl; }
+        .ltr { direction: ltr; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass fixed w-full z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <img src="/logo.svg" alt="BrainSAIT" class="h-10 w-10">
+                    <span class="text-white text-xl font-bold">BrainSAIT OCR</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#features" class="text-white hover:text-purple-200">المميزات</a>
+                    <a href="#pricing" class="text-white hover:text-purple-200">الأسعار</a>
+                    <a href="#how-it-works" class="text-white hover:text-purple-200">كيف يعمل</a>
+                    <a href="#contact" class="text-white hover:text-purple-200">تواصل معنا</a>
+                    <button onclick="openApp()" class="bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-purple-50">
+                        ابدأ الآن
+                    </button>
+                    <button onclick="toggleLanguage()" class="text-white hover:text-purple-200">
+                        <span id="langToggle">EN</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="container mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
+                قارئ الوثائق الذكي
+                <span class="block text-3xl md:text-4xl mt-4 text-purple-200">بدقة تفوق 95% للنصوص العربية</span>
+            </h1>
+            <p class="text-xl text-purple-100 mb-8 max-w-3xl mx-auto">
+                حوّل وثائقك ومستنداتك إلى نصوص رقمية قابلة للتحرير والبحث باستخدام أحدث تقنيات الذكاء الاصطناعي من Mistral AI
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="openApp()" class="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-bold hover:bg-purple-50 transform hover:scale-105 transition">
+                    جرب مجاناً
+                </button>
+                <button onclick="scrollToSection('pricing')" class="glass text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-white/20">
+                    عرض الباقات
+                </button>
+            </div>
+            <p class="text-purple-200 mt-6">✨ 10 معالجات مجانية عند التسجيل</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 px-6">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="glass rounded-2xl p-6 text-center">
+                    <div class="text-4xl font-bold text-white mb-2">95%+</div>
+                    <div class="text-purple-200">دقة OCR العربي</div>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <div class="text-4xl font-bold text-white mb-2">2000+</div>
+                    <div class="text-purple-200">صفحة/دقيقة</div>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <div class="text-4xl font-bold text-white mb-2">100+</div>
+                    <div class="text-purple-200">لغة مدعومة</div>
+                </div>
+                <div class="glass rounded-2xl p-6 text-center">
+                    <div class="text-4xl font-bold text-white mb-2">24/7</div>
+                    <div class="text-purple-200">دعم فني</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-white text-center mb-16">المميزات الرئيسية</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v11a2 2 0 01-2 2H4V5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">OCR عربي متقدم</h3>
+                    <p class="text-purple-200">تعرف دقيق على النصوص العربية مع الحفاظ على التشكيل والتنسيق</p>
+                </div>
+                
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 7H7v6h6V7z"></path>
+                            <path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">معالجة دفعية</h3>
+                    <p class="text-purple-200">معالجة آلاف الصفحات في دقائق معدودة مع الحفاظ على الجودة</p>
+                </div>
+                
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">تكامل RAG</h3>
+                    <p class="text-purple-200">استخدم الذكاء الاصطناعي للبحث والاستعلام في وثائقك المعالجة</p>
+                </div>
+                
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a2 2 0 012-2h12a2 2 0 012 2v5a2 2 0 01-2 2H4a2 2 0 01-2-2v-5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">API قوية</h3>
+                    <p class="text-purple-200">تكامل سهل مع أنظمتك الحالية عبر REST API</p>
+                </div>
+                
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">أمان متقدم</h3>
+                    <p class="text-purple-200">تشفير كامل للبيانات وحماية الخصوصية وفقاً لأعلى المعايير</p>
+                </div>
+                
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">دفع محلي</h3>
+                    <p class="text-purple-200">دعم كامل لوسائل الدفع السعودية: مدى، Apple Pay، STC Pay</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-white text-center mb-16">باقات الأسعار</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Free Tier -->
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <h3 class="text-2xl font-bold text-white mb-4">مجاني</h3>
+                    <div class="text-4xl font-bold text-white mb-6">
+                        0 <span class="text-xl">ريال/شهر</span>
+                    </div>
+                    <ul class="text-purple-200 space-y-3 mb-8">
+                        <li>✓ 10 معالجات شهرياً</li>
+                        <li>✓ دعم أساسي</li>
+                        <li>✓ تصدير PDF وWord</li>
+                    </ul>
+                    <button onclick="register('free')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                        ابدأ مجاناً
+                    </button>
+                </div>
+                
+                <!-- Starter Tier -->
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition border-2 border-white/30">
+                    <div class="bg-yellow-400 text-purple-900 px-3 py-1 rounded-full text-sm font-bold inline-block mb-4">
+                        الأكثر شعبية
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">المبتدئ</h3>
+                    <div class="text-4xl font-bold text-white mb-6">
+                        49 <span class="text-xl">ريال/شهر</span>
+                    </div>
+                    <ul class="text-purple-200 space-y-3 mb-8">
+                        <li>✓ 100 معالجة شهرياً</li>
+                        <li>✓ دعم الأولوية</li>
+                        <li>✓ API متاح</li>
+                        <li>✓ جميع صيغ التصدير</li>
+                    </ul>
+                    <button onclick="register('starter')" class="w-full bg-white text-purple-600 py-3 rounded-full font-bold hover:bg-purple-50">
+                        اشترك الآن
+                    </button>
+                </div>
+                
+                <!-- Professional Tier -->
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <h3 class="text-2xl font-bold text-white mb-4">احترافي</h3>
+                    <div class="text-4xl font-bold text-white mb-6">
+                        199 <span class="text-xl">ريال/شهر</span>
+                    </div>
+                    <ul class="text-purple-200 space-y-3 mb-8">
+                        <li>✓ 500 معالجة شهرياً</li>
+                        <li>✓ معالجة دفعية</li>
+                        <li>✓ تكامل RAG</li>
+                        <li>✓ دعم فني 24/7</li>
+                        <li>✓ API غير محدود</li>
+                    </ul>
+                    <button onclick="register('professional')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                        اشترك الآن
+                    </button>
+                </div>
+                
+                <!-- Enterprise Tier -->
+                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
+                    <h3 class="text-2xl font-bold text-white mb-4">المؤسسات</h3>
+                    <div class="text-4xl font-bold text-white mb-6">
+                        999 <span class="text-xl">ريال/شهر</span>
+                    </div>
+                    <ul class="text-purple-200 space-y-3 mb-8">
+                        <li>✓ معالجات غير محدودة</li>
+                        <li>✓ دعم مخصص</li>
+                        <li>✓ تكامل مخصص</li>
+                        <li>✓ SLA ضمان</li>
+                        <li>✓ تدريب الفريق</li>
+                    </ul>
+                    <button onclick="register('enterprise')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                        تواصل معنا
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 px-6">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold text-white text-center mb-16">كيف يعمل؟</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-white">1</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">ارفع الملف</h3>
+                    <p class="text-purple-200">اسحب وأفلت أو اختر الملف المطلوب</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-white">2</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">معالجة ذكية</h3>
+                    <p class="text-purple-200">AI يستخرج النص بدقة عالية</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-white">3</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">مراجعة وتحرير</h3>
+                    <p class="text-purple-200">راجع النص وعدل إذا لزم</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-3xl font-bold text-white">4</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">تصدير ومشاركة</h3>
+                    <p class="text-purple-200">حمل بالصيغة المطلوبة</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6">
+        <div class="container mx-auto text-center">
+            <div class="glass rounded-3xl p-12">
+                <h2 class="text-4xl font-bold text-white mb-6">ابدأ رحلتك مع BrainSAIT OCR</h2>
+                <p class="text-xl text-purple-200 mb-8 max-w-2xl mx-auto">
+                    انضم لآلاف المستخدمين الذين يثقون في خدماتنا لتحويل وثائقهم
+                </p>
+                <button onclick="openApp()" class="bg-white text-purple-600 px-10 py-4 rounded-full text-lg font-bold hover:bg-purple-50 transform hover:scale-105 transition">
+                    ابدأ التجربة المجانية
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glass mt-20">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-white font-bold mb-4">BrainSAIT OCR</h3>
+                    <p class="text-purple-200">قارئ الوثائق الذكي المدعوم بالذكاء الاصطناعي</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">روابط سريعة</h4>
+                    <ul class="text-purple-200 space-y-2">
+                        <li><a href="#features" class="hover:text-white">المميزات</a></li>
+                        <li><a href="#pricing" class="hover:text-white">الأسعار</a></li>
+                        <li><a href="/api-docs" class="hover:text-white">API</a></li>
+                        <li><a href="/support" class="hover:text-white">الدعم</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">قانوني</h4>
+                    <ul class="text-purple-200 space-y-2">
+                        <li><a href="/privacy" class="hover:text-white">سياسة الخصوصية</a></li>
+                        <li><a href="/terms" class="hover:text-white">الشروط والأحكام</a></li>
+                        <li><a href="/sla" class="hover:text-white">SLA</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-4">تواصل معنا</h4>
+                    <p class="text-purple-200">support@brainsait.com</p>
+                    <p class="text-purple-200">+966 50 123 4567</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="https://twitter.com/brainsait369" class="text-purple-200 hover:text-white">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="https://github.com/fadil369" class="text-purple-200 hover:text-white">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/20 mt-8 pt-8 text-center">
+                <p class="text-purple-200">© 2025 BrainSAIT. جميع الحقوق محفوظة. صنع بـ ❤️ بواسطة د. فاضل</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function openApp() {
+            window.location.href = '/app';
+        }
+        
+        function register(tier) {
+            window.location.href = `/register?tier=${tier}`;
+        }
+        
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function toggleLanguage() {
+            const toggle = document.getElementById('langToggle');
+            const isArabic = document.documentElement.dir === 'rtl';
+            
+            if (isArabic) {
+                document.documentElement.dir = 'ltr';
+                document.documentElement.lang = 'en';
+                toggle.textContent = 'AR';
+                // Update text content for English
+            } else {
+                document.documentElement.dir = 'rtl';
+                document.documentElement.lang = 'ar';
+                toggle.textContent = 'EN';
+                // Update text content for Arabic
+            }
+        }
+    </script>
+</body>
+</html>

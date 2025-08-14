@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainSAIT OCR - قارئ الوثائق الذكي</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        .ltr { direction: ltr; }
+        .rtl { direction: rtl; }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .upload-zone {
+            border: 2px dashed #cbd5e0;
+            transition: all 0.3s ease;
+        }
+        .upload-zone:hover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        .upload-zone.dragover {
+            border-color: #667eea;
+            background-color: rgba(102, 126, 234, 0.1);
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .arabic-font {
+            font-family: 'Noto Sans Arabic', 'Arial Unicode MS', Arial, sans-serif;
+        }
+        .english-font {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen gradient-bg arabic-font">
+    <!-- Header -->
+    <header class="glass-effect shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center">
+                        <svg class="w-8 h-8 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 102 0V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm2.5 3.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">قارئ الوثائق الذكي</h1>
+                        <p class="text-purple-200 text-sm">BrainSAIT OCR - Powered by Mistral AI</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="langToggle" class="px-4 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all">
+                        <span id="langText">English</span>
+                    </button>
+                    <button id="helpBtn" class="p-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- API Key Setup -->
+        <div id="apiKeySection" class="glass-effect rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-semibold text-white mb-4">إعداد مفتاح API</h2>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="password" id="apiKey" placeholder="أدخل مفتاح Mistral API الخاص بك" 
+                       class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <button id="saveApiKey" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+                    حفظ المفتاح
+                </button>
+            </div>
+            <p class="text-purple-200 text-sm mt-2">
+                احصل على مفتاحك من <a href="https://console.mistral.ai" target="_blank" class="underline hover:text-white">منصة Mistral AI</a>
+            </p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="glass-effect rounded-2xl p-6 mb-8">
+            <h2 class="text-xl font-semibold text-white mb-4">رفع الوثائق</h2>
+            
+            <div id="uploadZone" class="upload-zone rounded-lg p-8 text-center cursor-pointer">
+                <div id="uploadContent">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                    <p class="text-gray-600 text-lg mb-2">اسحب وأفلت الملفات هنا أو انقر للاختيار</p>
+                    <p class="text-gray-500 text-sm">يدعم: PDF, PNG, JPG, JPEG (حتى 50 ميجابايت)</p>
+                </div>
+                
+                <div id="uploadProgress" class="hidden">
+                    <div class="spinner mx-auto mb-4"></div>
+                    <p class="text-purple-600 font-medium">جاري رفع الملف...</p>
+                </div>
+            </div>
+            
+            <input type="file" id="fileInput" multiple accept=".pdf,.png,.jpg,.jpeg" class="hidden">
+            
+            <!-- Processing Options -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <label class="flex items-center space-x-3">
+                        <input type="checkbox" id="extractImages" checked class="form-checkbox text-purple-600">
+                        <span class="text-white">استخراج الصور</span>
+                    </label>
+                </div>
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <label class="flex items-center space-x-3">
+                        <input type="checkbox" id="preserveFormatting" checked class="form-checkbox text-purple-600">
+                        <span class="text-white">الحفاظ على التنسيق</span>
+                    </label>
+                </div>
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <label class="flex items-center space-x-3">
+                        <input type="checkbox" id="autoTranslate" class="form-checkbox text-purple-600">
+                        <span class="text-white">ترجمة تلقائية</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Status -->
+        <div id="processingSection" class="glass-effect rounded-2xl p-6 mb-8 hidden">
+            <h2 class="text-xl font-semibold text-white mb-4">حالة المعالجة</h2>
+            <div id="fileQueue" class="space-y-3"></div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="glass-effect rounded-2xl p-6 hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-white">النتائج</h2>
+                <div class="flex space-x-3">
+                    <button id="downloadJson" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        تحميل JSON
+                    </button>
+                    <button id="downloadMarkdown" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        تحميل Markdown
+                    </button>
+                    <button id="copyToClipboard" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        نسخ النص
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Preview Column -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <h3 class="text-lg font-medium text-white mb-3">معاينة الوثيقة</h3>
+                    <div id="documentPreview" class="bg-white rounded-lg p-4 max-h-96 overflow-auto">
+                        <!-- Document preview will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Extracted Text Column -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                    <h3 class="text-lg font-medium text-white mb-3">النص المستخرج</h3>
+                    <div id="extractedText" class="bg-gray-900 text-green-400 rounded-lg p-4 max-h-96 overflow-auto font-mono text-sm">
+                        <!-- Extracted text will be inserted here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Metadata -->
+            <div class="mt-6 bg-white bg-opacity-10 rounded-lg p-4">
+                <h3 class="text-lg font-medium text-white mb-3">معلومات الوثيقة</h3>
+                <div id="documentMetadata" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <!-- Metadata will be inserted here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-effect mt-16">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <p class="text-purple-200 text-sm">
+                    © 2025 BrainSAIT - Dr. Fadil | Powered by Mistral AI
+                </p>
+                <div class="flex space-x-4">
+                    <a href="https://github.com/fadil369" class="text-purple-200 hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a href="https://x.com/brainsait369" class="text-purple-200 hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl p-6 max-w-md mx-4">
+            <h3 class="text-xl font-bold text-white mb-4">كيفية الاستخدام</h3>
+            <div class="text-purple-200 space-y-3 text-sm">
+                <p>1. أدخل مفتاح Mistral API الخاص بك</p>
+                <p>2. اسحب وأفلت الملفات أو انقر لاختيارها</p>
+                <p>3. اختر خيارات المعالجة المطلوبة</p>
+                <p>4. انتظر اكتمال المعالجة</p>
+                <p>5. حمل النتائج بصيغة JSON أو Markdown</p>
+            </div>
+            <button id="closeHelp" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors w-full">
+                إغلاق
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let mistralApiKey = '';
+        let processedFiles = [];
+        let currentLanguage = 'ar';
+
+        // Language data
+        const languages = {
+            ar: {
+                title: "قارئ الوثائق الذكي",
+                subtitle: "BrainSAIT OCR - Powered by Mistral AI",
+                apiKeySetup: "إعداد مفتاح API",
+                apiKeyPlaceholder: "أدخل مفتاح Mistral API الخاص بك",
+                saveKey: "حفظ المفتاح",
+                uploadDocs: "رفع الوثائق",
+                dragDrop: "اسحب وأفلت الملفات هنا أو انقر للاختيار",
+                supportedFormats: "يدعم: PDF, PNG, JPG, JPEG (حتى 50 ميجابايت)",
+                extractImages: "استخراج الصور",
+                preserveFormatting: "الحفاظ على التنسيق",
+                autoTranslate: "ترجمة تلقائية",
+                processingStatus: "حالة المعالجة",
+                results: "النتائج",
+                downloadJson: "تحميل JSON",
+                downloadMarkdown: "تحميل Markdown",
+                copyText: "نسخ النص",
+                documentPreview: "معاينة الوثيقة",
+                extractedText: "النص المستخرج",
+                documentInfo: "معلومات الوثيقة",
+                howToUse: "كيفية الاستخدام",
+                close: "إغلاق"
+            },
+            en: {
+                title: "Smart Document Reader",
+                subtitle: "BrainSAIT OCR - Powered by Mistral AI",
+                apiKeySetup: "API Key Setup",
+                apiKeyPlaceholder: "Enter your Mistral API key",
+                saveKey: "Save Key",
+                uploadDocs: "Upload Documents",
+                dragDrop: "Drag and drop files here or click to select",
+                supportedFormats: "Supports: PDF, PNG, JPG, JPEG (up to 50MB)",
+                extractImages: "Extract Images",
+                preserveFormatting: "Preserve Formatting",
+                autoTranslate: "Auto Translate",
+                processingStatus: "Processing Status",
+                results: "Results",
+                downloadJson: "Download JSON",
+                downloadMarkdown: "Download Markdown",
+                copyText: "Copy Text",
+                documentPreview: "Document Preview",
+                extractedText: "Extracted Text",
+                documentInfo: "Document Information",
+                howToUse: "How to Use",
+                close: "Close"
+            }
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
+            loadSavedApiKey();
+        });
+
+        function initializeApp() {
+            // Check for saved API key
+            const savedKey = localStorage.getItem('mistralApiKey');
+            if (savedKey) {
+                mistralApiKey = savedKey;
+                document.getElementById('apiKey').value = savedKey;
+                showNotification('تم تحميل مفتاح API المحفوظ', 'success');
+            }
+        }
+
+        function setupEventListeners() {
+            // API Key
+            document.getElementById('saveApiKey').addEventListener('click', saveApiKey);
+            
+            // File upload
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('fileInput');
+            
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', handleDragOver);
+            uploadZone.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+            
+            // Language toggle
+            document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+            
+            // Help modal
+            document.getElementById('helpBtn').addEventListener('click', showHelp);
+            document.getElementById('closeHelp').addEventListener('click', hideHelp);
+            
+            // Download buttons
+            document.getElementById('downloadJson').addEventListener('click', downloadAsJson);
+            document.getElementById('downloadMarkdown').addEventListener('click', downloadAsMarkdown);
+            document.getElementById('copyToClipboard').addEventListener('click', copyToClipboard);
+        }
+
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                showNotification('يرجى إدخال مفتاح API صحيح', 'error');
+                return;
+            }
+            
+            mistralApiKey = apiKey;
+            localStorage.setItem('mistralApiKey', apiKey);
+            showNotification('تم حفظ مفتاح API بنجاح', 'success');
+        }
+
+        function loadSavedApiKey() {
+            const savedKey = localStorage.getItem('mistralApiKey');
+            if (savedKey) {
+                mistralApiKey = savedKey;
+                document.getElementById('apiKey').value = savedKey;
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            if (!mistralApiKey) {
+                showNotification('يرجى إعداد مفتاح API أولاً', 'error');
+                return;
+            }
+
+            // Filter valid files
+            const validFiles = files.filter(file => {
+                const validTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+                const maxSize = 50 * 1024 * 1024; // 50MB
+                
+                if (!validTypes.includes(file.type)) {
+                    showNotification(`نوع الملف غير مدعوم: ${file.name}`, 'error');
+                    return false;
+                }
+                
+                if (file.size > maxSize) {
+                    showNotification(`حجم الملف كبير جداً: ${file.name}`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            // Show processing section
+            document.getElementById('processingSection').classList.remove('hidden');
+            
+            // Process each file
+            validFiles.forEach((file, index) => {
+                processFileWithMistral(file, index);
+            });
+        }
+
+        async function processFileWithMistral(file, index) {
+            try {
+                // Add file to queue
+                addFileToQueue(file, index, 'processing');
+                
+                // Convert file to base64
+                const base64Data = await fileToBase64(file);
+                
+                // Prepare request
+                const requestData = {
+                    model: "mistral-ocr-latest",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: base64Data
+                                    }
+                                },
+                                {
+                                    type: "text",
+                                    text: "Extract all text from this document. Preserve formatting, structure, and any tables. If there are images, describe them. Return the result in Markdown format."
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                // Make API request
+                const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${mistralApiKey}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const extractedText = result.choices[0].message.content;
+
+                // Update file status
+                updateFileStatus(index, 'completed');
+                
+                // Store result
+                processedFiles.push({
+                    file: file,
+                    extractedText: extractedText,
+                    metadata: {
+                        fileName: file.name,
+                        fileSize: formatFileSize(file.size),
+                        fileType: file.type,
+                        processedAt: new Date().toISOString()
+                    }
+                });
+
+                // Show results if this is the first completed file
+                if (processedFiles.length === 1) {
+                    showResults();
+                }
+
+            } catch (error) {
+                console.error('Error processing file:', error);
+                updateFileStatus(index, 'error', error.message);
+                showNotification(`خطأ في معالجة الملف: ${file.name}`, 'error');
+            }
+        }
+
+        function addFileToQueue(file, index, status) {
+            const queueElement = document.getElementById('fileQueue');
+            const fileDiv = document.createElement('div');
+            fileDiv.id = `file-${index}`;
+            fileDiv.className = 'flex items-center justify-between bg-white bg-opacity-10 rounded-lg p-3';
+            
+            fileDiv.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white font-medium">${file.name}</p>
+                        <p class="text-purple-200 text-sm">${formatFileSize(file.size)}</p>
+                    </div>
+                </div>
+                <div id="status-${index}" class="flex items-center">
+                    <div class="spinner w-5 h-5"></div>
+                </div>
+            `;
+            
+            queueElement.appendChild(fileDiv);
+        }
+
+        function updateFileStatus(index, status, error = null) {
+            const statusElement = document.getElementById(`status-${index}`);
+            
+            if (status === 'completed') {
+                statusElement.innerHTML = `
+                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                `;
+            } else if (status === 'error') {
+                statusElement.innerHTML = `
+                    <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                `;
+            }
+        }
+
+        function showResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+            resultsSection.classList.add('fade-in');
+            
+            // Display first file results
+            if (processedFiles.length > 0) {
+                const firstFile = processedFiles[0];
+                displayFileResults(firstFile);
+            }
+        }
+
+        function displayFileResults(fileData) {
+            // Display extracted text
+            const extractedTextElement = document.getElementById('extractedText');
+            extractedTextElement.textContent = fileData.extractedText;
+            
+            // Display metadata
+            const metadataElement = document.getElementById('documentMetadata');
+            metadataElement.innerHTML = `
+                <div class="text-purple-200">
+                    <p class="font-medium">اسم الملف</p>
+                    <p class="text-white">${fileData.metadata.fileName}</p>
+                </div>
+                <div class="text-purple-200">
+                    <p class="font-medium">حجم الملف</p>
+                    <p class="text-white">${fileData.metadata.fileSize}</p>
+                </div>
+                <div class="text-purple-200">
+                    <p class="font-medium">نوع الملف</p>
+                    <p class="text-white">${fileData.metadata.fileType}</p>
+                </div>
+            `;
+        }
+
+        function downloadAsJson() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                totalFiles: processedFiles.length,
+                files: processedFiles.map(file => ({
+                    metadata: file.metadata,
+                    extractedText: file.extractedText
+                }))
+            };
+            
+            downloadFile(JSON.stringify(data, null, 2), 'brainsait-ocr-results.json', 'application/json');
+        }
+
+        function downloadAsMarkdown() {
+            let markdown = '# BrainSAIT OCR Results\n\n';
+            markdown += `Generated on: ${new Date().toISOString()}\n\n`;
+            
+            processedFiles.forEach((fileData, index) => {
+                markdown += `## Document ${index + 1}: ${fileData.metadata.fileName}\n\n`;
+                markdown += `**File Size:** ${fileData.metadata.fileSize}\n`;
+                markdown += `**File Type:** ${fileData.metadata.fileType}\n`;
+                markdown += `**Processed At:** ${fileData.metadata.processedAt}\n\n`;
+                markdown += '### Extracted Content\n\n';
+                markdown += fileData.extractedText + '\n\n';
+                markdown += '---\n\n';
+            });
+            
+            downloadFile(markdown, 'brainsait-ocr-results.md', 'text/markdown');
+        }
+
+        function copyToClipboard() {
+            if (processedFiles.length === 0) return;
+            
+            const allText = processedFiles.map(file => file.extractedText).join('\n\n---\n\n');
+            navigator.clipboard.writeText(allText).then(() => {
+                showNotification('تم نسخ النص إلى الحافظة', 'success');
+            });
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            if (bytes === 0) return '0 Bytes';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const lang = languages[currentLanguage];
+            document.getElementById('langText').textContent = currentLanguage === 'ar' ? 'English' : 'عربي';
+            
+            // Update document direction
+            document.documentElement.dir = currentLanguage === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLanguage;
+            
+            // Update text content (simplified for demo)
+            // In a real implementation, you would update all text elements
+        }
+
+        function showHelp() {
+            document.getElementById('helpModal').classList.remove('hidden');
+            document.getElementById('helpModal').classList.add('flex');
+        }
+
+        function hideHelp() {
+            document.getElementById('helpModal').classList.add('hidden');
+            document.getElementById('helpModal').classList.remove('flex');
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all transform translate-x-full`;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            notification.classList.add(bgColor);
+            
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-white">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
