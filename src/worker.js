@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { jwt } from 'hono/jwt';
+import { jwtVerify } from 'jose';
 import { authRoutes } from './routes/auth';
 import { ocrRoutes } from './routes/ocr';
 import { paymentRoutes } from './routes/payment';
@@ -11,7 +11,12 @@ const app = new Hono();
 
 // CORS middleware
 app.use('*', cors({
-  origin: ['https://brainsait-ocr.pages.dev', 'http://localhost:3000'],
+  origin: [
+    'https://brainsait-ocr.pages.dev', 
+    'https://0fdf3dfe.brainsait-ocr.pages.dev',
+    'https://c11886df.brainsait-ocr.pages.dev',
+    'http://localhost:3000'
+  ],
   credentials: true,
 }));
 
@@ -27,7 +32,8 @@ app.use('/api/*', async (c, next) => {
   }
   
   try {
-    const payload = await jwt.verify(token, c.env.JWT_SECRET);
+    const secret = new TextEncoder().encode(c.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
     c.set('userId', payload.sub);
     await next();
   } catch (error) {

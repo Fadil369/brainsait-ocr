@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 export const ocrRoutes = new Hono();
 
@@ -35,6 +35,12 @@ ocrRoutes.post('/process', async (c) => {
     const MAX_SIZE = 50 * 1024 * 1024; // 50MB
     if (file.size > MAX_SIZE) {
       return c.json({ error: 'File too large' }, 413);
+    }
+    
+    // Check supported file types
+    const supportedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!supportedTypes.includes(file.type)) {
+      return c.json({ error: `Unsupported file type: ${file.type}. Supported types: PDF, PNG, JPG, JPEG, WEBP` }, 400);
     }
     
     // Calculate file hash for caching
@@ -109,7 +115,11 @@ ocrRoutes.post('/process', async (c) => {
     
   } catch (error) {
     console.error('OCR processing error:', error);
-    return c.json({ error: 'OCR processing failed' }, 500);
+    return c.json({ 
+      error: 'OCR processing failed',
+      details: error.message,
+      stack: error.stack
+    }, 500);
   }
 });
 
@@ -257,7 +267,7 @@ async function processWithMistral(dataUri, options, env) {
       'Authorization': `Bearer ${env.MISTRAL_API_KEY}`
     },
     body: JSON.stringify({
-      model: 'mistral-ocr-latest',
+      model: 'pixtral-12b-2409',
       messages: [
         {
           role: 'system',

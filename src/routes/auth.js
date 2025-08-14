@@ -1,7 +1,20 @@
 import { Hono } from 'hono';
-import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 import { v4 as uuidv4 } from 'uuid';
+
+// Simple password hashing using Web Crypto API
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function verifyPassword(password, hash) {
+  const hashedInput = await hashPassword(password);
+  return hashedInput === hash;
+}
 
 export const authRoutes = new Hono();
 
@@ -25,14 +38,14 @@ authRoutes.post('/register', async (c) => {
     }
     
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
     const userId = uuidv4();
     
     // Create user
     await c.env.DB.prepare(
       `INSERT INTO users (id, email, password, name, phone, created_at, credits, subscription_tier) 
        VALUES (?, ?, ?, ?, ?, datetime('now'), 10, 'free')`
-    ).bind(userId, email, hashedPassword, name, phone).run();
+    ).bind(userId, email, hashedPassword, name, phone || null).run();
     
     // Generate JWT
     const token = await new SignJWT({ sub: userId, email })
@@ -54,7 +67,10 @@ authRoutes.post('/register', async (c) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    return c.json({ error: 'Registration failed' }, 500);
+    return c.json({ 
+      error: 'Registration failed',
+      details: error.message 
+    }, 500);
   }
 });
 
@@ -77,7 +93,7 @@ authRoutes.post('/login', async (c) => {
     }
     
     // Verify password
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await verifyPassword(password, user.password);
     if (!validPassword) {
       return c.json({ error: 'Invalid credentials' }, 401);
     }

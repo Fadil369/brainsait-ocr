@@ -3,7 +3,7 @@ class BrainSAITApp {
     constructor() {
         this.apiUrl = window.location.hostname === 'localhost' 
             ? 'http://localhost:8787/api' 
-            : '/api';
+            : 'https://brainsait-ocr-worker.fadil.workers.dev/api';
         this.token = localStorage.getItem('auth_token');
         this.user = null;
         this.processedFiles = [];

@@ -1,28 +1,27 @@
 name = "brainsait-ocr-worker"
 main = "src/worker.js"
-compatibility_date = "2024-01-01"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
 
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
 [[d1_databases]]
 binding = "DB"
-database_name = "brainsait-ocr-db"
-database_id = "YOUR_DATABASE_ID"
+database_name = "dash"
+database_id = "bc02f5ff-ac98-4aab-9e3f-34a96e14a434"
 
-[[r2_buckets]]
-binding = "STORAGE"
-bucket_name = "brainsait-ocr-storage"
+# [[r2_buckets]]
+# binding = "STORAGE"
+# bucket_name = "brainsait-ocr-storage"
 
 [[kv_namespaces]]
 binding = "CACHE"
-id = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_KV_PREVIEW_ID"
+id = "35b31bbbdb6340eaaf79cbd9c10ec958"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "YOUR_SESSIONS_KV_ID"
-preview_id = "YOUR_SESSIONS_PREVIEW_ID"
+id = "7cc8d27d9d334ad3b014328dc743c106"
 
 [ai]
 binding = "AI"

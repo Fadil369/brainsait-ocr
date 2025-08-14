@@ -8,240 +8,532 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Tajawal', sans-serif; }
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --navy-900: #0f172a;
+            --navy-800: #1e293b;
+            --navy-700: #334155;
+            --navy-600: #475569;
+            --navy-500: #64748b;
+            --navy-400: #94a3b8;
+            --navy-300: #cbd5e1;
+            --navy-200: #e2e8f0;
+            --navy-100: #f1f5f9;
+            --accent-blue: #3b82f6;
+            --accent-blue-dark: #1d4ed8;
+            --gradient-dark: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            --gradient-light: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
         }
+        
+        body { 
+            font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-dark);
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
         .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-light {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(15, 23, 42, 0.1);
+            box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+            color: var(--navy-900);
+        }
+        
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
         }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
+        
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-blur {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-solid {
+            background: rgba(15, 23, 42, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: var(--navy-900);
+                transition: right 0.3s ease;
+                z-index: 50;
+                padding: 2rem;
+            }
+            
+            .mobile-menu.open {
+                right: 0;
+            }
+            
+            .mobile-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .mobile-overlay.open {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+        
         .rtl { direction: rtl; }
         .ltr { direction: ltr; }
+        
+        /* Responsive spacing */
+        .container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            max-width: 1280px;
+        }
+        
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .container {
+                padding-left: 3rem;
+                padding-right: 3rem;
+            }
+        }
+        
+        /* Section spacing */
+        .section-padding {
+            padding-top: 4rem;
+            padding-bottom: 4rem;
+        }
+        
+        @media (min-width: 640px) {
+            .section-padding {
+                padding-top: 5rem;
+                padding-bottom: 5rem;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .section-padding {
+                padding-top: 6rem;
+                padding-bottom: 6rem;
+            }
+        }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
+<body class="min-h-screen">
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="flex justify-between items-center mb-8">
+            <span class="text-xl font-bold text-white">BrainSAIT OCR</span>
+            <button onclick="closeMobileMenu()" class="text-white p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <nav class="space-y-6">
+            <a href="#features" class="nav-link block text-lg text-white hover:text-blue-400 transition-colors" onclick="closeMobileMenu()" data-ar="المميزات" data-en="Features">المميزات</a>
+            <a href="#pricing" class="nav-link block text-lg text-white hover:text-blue-400 transition-colors" onclick="closeMobileMenu()" data-ar="الأسعار" data-en="Pricing">الأسعار</a>
+            <a href="#how-it-works" class="nav-link block text-lg text-white hover:text-blue-400 transition-colors" onclick="closeMobileMenu()" data-ar="كيف يعمل" data-en="How it works">كيف يعمل</a>
+            <button onclick="openApp(); closeMobileMenu();" class="btn-primary w-full px-6 py-3 rounded-xl font-medium start-btn" data-ar="ابدأ الآن" data-en="Get Started">
+                ابدأ الآن
+            </button>
+            <button onclick="toggleLanguage()" class="btn-secondary w-full px-6 py-3 rounded-xl font-medium">
+                <span id="langToggleMobile">English</span>
+            </button>
+        </nav>
+    </div>
+    
     <!-- Navigation -->
-    <nav class="glass fixed w-full z-50">
-        <div class="container mx-auto px-6 py-4">
+    <nav id="mainNav" class="nav-blur fixed w-full z-30 top-0">
+        <div class="container mx-auto py-3 sm:py-4">
             <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <img src="/logo.svg" alt="BrainSAIT" class="h-10 w-10">
-                    <span class="text-white text-xl font-bold">BrainSAIT OCR</span>
+                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v11a2 2 0 01-2 2H4V5z"/>
+                        </svg>
+                    </div>
+                    <span class="text-white text-lg sm:text-xl font-bold">BrainSAIT OCR</span>
                 </div>
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-white hover:text-purple-200">المميزات</a>
-                    <a href="#pricing" class="text-white hover:text-purple-200">الأسعار</a>
-                    <a href="#how-it-works" class="text-white hover:text-purple-200">كيف يعمل</a>
-                    <a href="#contact" class="text-white hover:text-purple-200">تواصل معنا</a>
-                    <button onclick="openApp()" class="bg-white text-purple-600 px-6 py-2 rounded-full font-medium hover:bg-purple-50">
+                
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-6 rtl:space-x-reverse">
+                    <a href="#features" class="nav-link text-gray-300 hover:text-white transition-colors" data-ar="المميزات" data-en="Features">المميزات</a>
+                    <a href="#pricing" class="nav-link text-gray-300 hover:text-white transition-colors" data-ar="الأسعار" data-en="Pricing">الأسعار</a>
+                    <a href="#how-it-works" class="nav-link text-gray-300 hover:text-white transition-colors" data-ar="كيف يعمل" data-en="How it works">كيف يعمل</a>
+                    <button onclick="openApp()" class="btn-primary px-6 py-2 rounded-xl font-medium start-btn" data-ar="ابدأ الآن" data-en="Get Started">
                         ابدأ الآن
                     </button>
-                    <button onclick="toggleLanguage()" class="text-white hover:text-purple-200">
+                    <button onclick="toggleLanguage()" class="btn-secondary px-4 py-2 rounded-xl">
                         <span id="langToggle">EN</span>
                     </button>
                 </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden text-white p-2" onclick="openMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-6">
-        <div class="container mx-auto text-center">
-            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6">
-                قارئ الوثائق الذكي
-                <span class="block text-3xl md:text-4xl mt-4 text-purple-200">بدقة تفوق 95% للنصوص العربية</span>
-            </h1>
-            <p class="text-xl text-purple-100 mb-8 max-w-3xl mx-auto">
-                حوّل وثائقك ومستنداتك إلى نصوص رقمية قابلة للتحرير والبحث باستخدام أحدث تقنيات الذكاء الاصطناعي من Mistral AI
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="openApp()" class="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-bold hover:bg-purple-50 transform hover:scale-105 transition">
-                    جرب مجاناً
-                </button>
-                <button onclick="scrollToSection('pricing')" class="glass text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-white/20">
-                    عرض الباقات
-                </button>
+    <section class="pt-28 sm:pt-36 pb-20 sm:pb-24">
+        <div class="container mx-auto text-center px-4 sm:px-6">
+            <div class="max-w-6xl mx-auto">
+                <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 sm:mb-8 leading-tight">
+                    <span class="text-gradient hero-title" data-ar="قارئ الوثائق الذكي" data-en="Smart Document Reader">قارئ الوثائق الذكي</span>
+                    <span class="block text-xl sm:text-2xl lg:text-4xl mt-3 sm:mt-4 text-gray-300 font-medium hero-subtitle" data-ar="بدقة تفوق 95% للنصوص العربية" data-en="95%+ Accuracy for Arabic Text">
+                        بدقة تفوق 95% للنصوص العربية
+                    </span>
+                </h1>
+                <p class="text-lg sm:text-xl text-gray-300 mb-10 sm:mb-12 max-w-4xl mx-auto leading-relaxed hero-description" data-ar="حوّل وثائقك ومستنداتك إلى نصوص رقمية قابلة للتحرير والبحث باستخدام أحدث تقنيات الذكاء الاصطناعي من Mistral AI" data-en="Transform your documents into editable, searchable digital text using the latest AI technology from Mistral AI">
+                    حوّل وثائقك ومستنداتك إلى نصوص رقمية قابلة للتحرير والبحث باستخدام أحدث تقنيات الذكاء الاصطناعي من Mistral AI
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center max-w-sm sm:max-w-none mx-auto mb-10">
+                    <button onclick="openApp()" class="btn-primary px-8 sm:px-10 py-4 rounded-xl text-lg font-bold w-full sm:w-auto shadow-lg hero-cta-primary" data-ar="جرب مجاناً" data-en="Try Free">
+                        جرب مجاناً
+                    </button>
+                    <button onclick="scrollToSection('pricing')" class="btn-secondary px-8 sm:px-10 py-4 rounded-xl text-lg font-bold w-full sm:w-auto hero-cta-secondary" data-ar="عرض الباقات" data-en="View Plans">
+                        عرض الباقات
+                    </button>
+                </div>
+                <div class="flex items-center justify-center text-blue-400">
+                    <svg class="w-5 h-5 ml-2 rtl:ml-0 rtl:mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    <span class="text-sm sm:text-base hero-feature" data-ar="10 معالجات مجانية عند التسجيل" data-en="10 free processes upon registration">10 معالجات مجانية عند التسجيل</span>
+                </div>
             </div>
-            <p class="text-purple-200 mt-6">✨ 10 معالجات مجانية عند التسجيل</p>
         </div>
     </section>
 
     <!-- Stats Section -->
-    <section class="py-16 px-6">
+    <section class="section-padding">
         <div class="container mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white mb-2">95%+</div>
-                    <div class="text-purple-200">دقة OCR العربي</div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div class="glass rounded-2xl p-6 sm:p-8 text-center card-hover">
+                    <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">95%+</div>
+                    <div class="text-sm sm:text-base text-gray-300 font-medium" data-ar="دقة OCR العربي" data-en="Arabic OCR Accuracy">دقة OCR العربي</div>
                 </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white mb-2">2000+</div>
-                    <div class="text-purple-200">صفحة/دقيقة</div>
+                <div class="glass rounded-2xl p-6 sm:p-8 text-center card-hover">
+                    <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">2000+</div>
+                    <div class="text-sm sm:text-base text-gray-300 font-medium" data-ar="صفحة/دقيقة" data-en="Pages/Minute">صفحة/دقيقة</div>
                 </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white mb-2">100+</div>
-                    <div class="text-purple-200">لغة مدعومة</div>
+                <div class="glass rounded-2xl p-6 sm:p-8 text-center card-hover">
+                    <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">100+</div>
+                    <div class="text-sm sm:text-base text-gray-300 font-medium" data-ar="لغة مدعومة" data-en="Languages Supported">لغة مدعومة</div>
                 </div>
-                <div class="glass rounded-2xl p-6 text-center">
-                    <div class="text-4xl font-bold text-white mb-2">24/7</div>
-                    <div class="text-purple-200">دعم فني</div>
+                <div class="glass rounded-2xl p-6 sm:p-8 text-center card-hover">
+                    <div class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">24/7</div>
+                    <div class="text-sm sm:text-base text-gray-300 font-medium" data-ar="دعم فني" data-en="Technical Support">دعم فني</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 px-6">
+    <section id="features" class="section-padding">
         <div class="container mx-auto">
-            <h2 class="text-4xl font-bold text-white text-center mb-16">المميزات الرئيسية</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <div class="text-center mb-16 sm:mb-20">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6" data-ar="المميزات الرئيسية" data-en="Key Features">المميزات الرئيسية</h2>
+                <p class="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed" data-ar="اكتشف قوة التقنيات المتقدمة في معالجة النصوص العربية" data-en="Discover the power of advanced technologies in Arabic text processing">
+                    اكتشف قوة التقنيات المتقدمة في معالجة النصوص العربية
+                </p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
                             <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v11a2 2 0 01-2 2H4V5z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">OCR عربي متقدم</h3>
-                    <p class="text-purple-200">تعرف دقيق على النصوص العربية مع الحفاظ على التشكيل والتنسيق</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">OCR عربي متقدم</h3>
+                    <p class="text-gray-300 leading-relaxed">تعرف دقيق على النصوص العربية مع الحفاظ على التشكيل والتنسيق</p>
                 </div>
                 
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M13 7H7v6h6V7z"></path>
                             <path d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">معالجة دفعية</h3>
-                    <p class="text-purple-200">معالجة آلاف الصفحات في دقائق معدودة مع الحفاظ على الجودة</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">معالجة دفعية</h3>
+                    <p class="text-gray-300 leading-relaxed">معالجة آلاف الصفحات في دقائق معدودة مع الحفاظ على الجودة</p>
                 </div>
                 
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">تكامل RAG</h3>
-                    <p class="text-purple-200">استخدم الذكاء الاصطناعي للبحث والاستعلام في وثائقك المعالجة</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">تكامل RAG</h3>
+                    <p class="text-gray-300 leading-relaxed">استخدم الذكاء الاصطناعي للبحث والاستعلام في وثائقك المعالجة</p>
                 </div>
                 
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2 11a2 2 0 012-2h12a2 2 0 012 2v5a2 2 0 01-2 2H4a2 2 0 01-2-2v-5z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">API قوية</h3>
-                    <p class="text-purple-200">تكامل سهل مع أنظمتك الحالية عبر REST API</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">API قوية</h3>
+                    <p class="text-gray-300 leading-relaxed">تكامل سهل مع أنظمتك الحالية عبر REST API</p>
                 </div>
                 
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">أمان متقدم</h3>
-                    <p class="text-purple-200">تشفير كامل للبيانات وحماية الخصوصية وفقاً لأعلى المعايير</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">أمان متقدم</h3>
+                    <p class="text-gray-300 leading-relaxed">تشفير كامل للبيانات وحماية الخصوصية وفقاً لأعلى المعايير</p>
                 </div>
                 
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16z"></path>
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">دفع محلي</h3>
-                    <p class="text-purple-200">دعم كامل لوسائل الدفع السعودية: مدى، Apple Pay، STC Pay</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">دفع محلي</h3>
+                    <p class="text-gray-300 leading-relaxed">دعم كامل لوسائل الدفع السعودية: مدى، Apple Pay، STC Pay</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Pricing Section -->
-    <section id="pricing" class="py-20 px-6">
+    <section id="pricing" class="section-padding">
         <div class="container mx-auto">
-            <h2 class="text-4xl font-bold text-white text-center mb-16">باقات الأسعار</h2>
-            <div class="grid md:grid-cols-4 gap-8">
+            <div class="text-center mb-16 sm:mb-20">
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6" data-ar="باقات الأسعار" data-en="Pricing Plans">باقات الأسعار</h2>
+                <p class="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed" data-ar="اختر الباقة المناسبة لاحتياجاتك" data-en="Choose the plan that fits your needs">
+                    اختر الباقة المناسبة لاحتياجاتك
+                </p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                 <!-- Free Tier -->
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-white mb-4">مجاني</h3>
-                    <div class="text-4xl font-bold text-white mb-6">
-                        0 <span class="text-xl">ريال/شهر</span>
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">مجاني</h3>
+                    <div class="text-3xl sm:text-4xl font-bold text-white mb-6">
+                        0 <span class="text-lg sm:text-xl font-normal">ريال/شهر</span>
                     </div>
-                    <ul class="text-purple-200 space-y-3 mb-8">
-                        <li>✓ 10 معالجات شهرياً</li>
-                        <li>✓ دعم أساسي</li>
-                        <li>✓ تصدير PDF وWord</li>
+                    <ul class="text-gray-300 space-y-3 mb-8 text-sm sm:text-base">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            10 معالجات شهرياً
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            دعم أساسي
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            تصدير متعدد الصيغ
+                        </li>
                     </ul>
-                    <button onclick="register('free')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                    <button onclick="register('free')" class="btn-secondary w-full py-3 rounded-xl font-medium">
                         ابدأ مجاناً
                     </button>
                 </div>
                 
                 <!-- Starter Tier -->
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition border-2 border-white/30">
-                    <div class="bg-yellow-400 text-purple-900 px-3 py-1 rounded-full text-sm font-bold inline-block mb-4">
-                        الأكثر شعبية
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover relative border-2 border-blue-500">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                            الأكثر شعبية
+                        </span>
                     </div>
-                    <h3 class="text-2xl font-bold text-white mb-4">المبتدئ</h3>
-                    <div class="text-4xl font-bold text-white mb-6">
-                        49 <span class="text-xl">ريال/شهر</span>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">المبتدئ</h3>
+                    <div class="text-3xl sm:text-4xl font-bold text-white mb-6">
+                        49 <span class="text-lg sm:text-xl font-normal">ريال/شهر</span>
                     </div>
-                    <ul class="text-purple-200 space-y-3 mb-8">
-                        <li>✓ 100 معالجة شهرياً</li>
-                        <li>✓ دعم الأولوية</li>
-                        <li>✓ API متاح</li>
-                        <li>✓ جميع صيغ التصدير</li>
+                    <ul class="text-gray-300 space-y-3 mb-8 text-sm sm:text-base">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            100 معالجة شهرياً
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            دعم الأولوية
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            API متاح
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            جميع صيغ التصدير
+                        </li>
                     </ul>
-                    <button onclick="register('starter')" class="w-full bg-white text-purple-600 py-3 rounded-full font-bold hover:bg-purple-50">
+                    <button onclick="register('starter')" class="btn-primary w-full py-3 rounded-xl font-bold">
                         اشترك الآن
                     </button>
                 </div>
                 
                 <!-- Professional Tier -->
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-white mb-4">احترافي</h3>
-                    <div class="text-4xl font-bold text-white mb-6">
-                        199 <span class="text-xl">ريال/شهر</span>
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">احترافي</h3>
+                    <div class="text-3xl sm:text-4xl font-bold text-white mb-6">
+                        199 <span class="text-lg sm:text-xl font-normal">ريال/شهر</span>
                     </div>
-                    <ul class="text-purple-200 space-y-3 mb-8">
-                        <li>✓ 500 معالجة شهرياً</li>
-                        <li>✓ معالجة دفعية</li>
-                        <li>✓ تكامل RAG</li>
-                        <li>✓ دعم فني 24/7</li>
-                        <li>✓ API غير محدود</li>
+                    <ul class="text-gray-300 space-y-3 mb-8 text-sm sm:text-base">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            500 معالجة شهرياً
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            معالجة دفعية
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            تكامل RAG
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            دعم فني 24/7
+                        </li>
                     </ul>
-                    <button onclick="register('professional')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                    <button onclick="register('professional')" class="btn-secondary w-full py-3 rounded-xl font-medium">
                         اشترك الآن
                     </button>
                 </div>
                 
                 <!-- Enterprise Tier -->
-                <div class="glass rounded-2xl p-8 hover:transform hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-white mb-4">المؤسسات</h3>
-                    <div class="text-4xl font-bold text-white mb-6">
-                        999 <span class="text-xl">ريال/شهر</span>
+                <div class="glass rounded-2xl p-6 sm:p-8 card-hover">
+                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-4">المؤسسات</h3>
+                    <div class="text-3xl sm:text-4xl font-bold text-white mb-6">
+                        999 <span class="text-lg sm:text-xl font-normal">ريال/شهر</span>
                     </div>
-                    <ul class="text-purple-200 space-y-3 mb-8">
-                        <li>✓ معالجات غير محدودة</li>
-                        <li>✓ دعم مخصص</li>
-                        <li>✓ تكامل مخصص</li>
-                        <li>✓ SLA ضمان</li>
-                        <li>✓ تدريب الفريق</li>
+                    <ul class="text-gray-300 space-y-3 mb-8 text-sm sm:text-base">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            معالجات غير محدودة
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            دعم مخصص
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            تكامل مخصص
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 text-green-400 ml-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            SLA ضمان
+                        </li>
                     </ul>
-                    <button onclick="register('enterprise')" class="w-full bg-white/20 text-white py-3 rounded-full hover:bg-white/30">
+                    <button onclick="register('enterprise')" class="btn-secondary w-full py-3 rounded-xl font-medium">
                         تواصل معنا
                     </button>
                 </div>
@@ -351,34 +643,159 @@
     </footer>
 
     <script>
+        // Language data
+        const languages = {
+            ar: {
+                title: 'قارئ الوثائق الذكي',
+                subtitle: 'بدقة تفوق 95% للنصوص العربية',
+                description: 'حوّل وثائقك ومستنداتك إلى نصوص رقمية قابلة للتحرير والبحث باستخدام أحدث تقنيات الذكاء الاصطناعي من Mistral AI',
+                ctaPrimary: 'جرب مجاناً',
+                ctaSecondary: 'عرض الباقات',
+                feature: '10 معالجات مجانية عند التسجيل',
+                nav: {
+                    features: 'المميزات',
+                    pricing: 'الأسعار',
+                    howItWorks: 'كيف يعمل',
+                    getStarted: 'ابدأ الآن'
+                }
+            },
+            en: {
+                title: 'Smart Document Reader',
+                subtitle: '95%+ Accuracy for Arabic Text',
+                description: 'Transform your documents into editable, searchable digital text using the latest AI technology from Mistral AI',
+                ctaPrimary: 'Try Free',
+                ctaSecondary: 'View Plans',
+                feature: '10 free processes upon registration',
+                nav: {
+                    features: 'Features',
+                    pricing: 'Pricing',
+                    howItWorks: 'How it works',
+                    getStarted: 'Get Started'
+                }
+            }
+        };
+
+        let currentLang = 'ar';
+
         function openApp() {
-            window.location.href = '/app';
+            // Create the app directory if it doesn't exist
+            window.location.href = '/app/';
         }
         
         function register(tier) {
-            window.location.href = `/register?tier=${tier}`;
+            window.location.href = `/app/?tier=${tier}`;
         }
         
         function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function openMobileMenu() {
+            document.getElementById('mobileMenu').classList.add('open');
+            document.getElementById('mobileOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileMenu() {
+            document.getElementById('mobileMenu').classList.remove('open');
+            document.getElementById('mobileOverlay').classList.remove('open');
+            document.body.style.overflow = 'auto';
         }
         
         function toggleLanguage() {
-            const toggle = document.getElementById('langToggle');
-            const isArabic = document.documentElement.dir === 'rtl';
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const langData = languages[currentLang];
             
-            if (isArabic) {
-                document.documentElement.dir = 'ltr';
-                document.documentElement.lang = 'en';
-                toggle.textContent = 'AR';
-                // Update text content for English
-            } else {
-                document.documentElement.dir = 'rtl';
-                document.documentElement.lang = 'ar';
-                toggle.textContent = 'EN';
-                // Update text content for Arabic
+            // Update document direction and language
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+            
+            // Update language toggle buttons
+            const toggle = document.getElementById('langToggle');
+            const toggleMobile = document.getElementById('langToggleMobile');
+            
+            if (toggle) {
+                toggle.textContent = currentLang === 'ar' ? 'EN' : 'عربي';
+            }
+            if (toggleMobile) {
+                toggleMobile.textContent = currentLang === 'ar' ? 'English' : 'عربي';
+            }
+            
+            // Update all elements with data attributes
+            document.querySelectorAll('[data-ar][data-en]').forEach(element => {
+                const text = currentLang === 'ar' ? element.getAttribute('data-ar') : element.getAttribute('data-en');
+                element.textContent = text;
+            });
+            
+            // Save language preference
+            localStorage.setItem('preferred-language', currentLang);
+        }
+
+        function initializeLanguage() {
+            // Get saved language preference or default to Arabic
+            const savedLang = localStorage.getItem('preferred-language');
+            if (savedLang && savedLang !== currentLang) {
+                currentLang = savedLang;
+                updateLanguage();
             }
         }
+        
+        // Handle smooth scrolling for anchor links
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize language
+            initializeLanguage();
+
+            // Close mobile menu when clicking on menu items
+            const mobileLinks = document.querySelectorAll('#mobileMenu a[href^="#"]');
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    closeMobileMenu();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        setTimeout(() => {
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }, 300);
+                    }
+                });
+            });
+            
+            // Handle desktop navigation
+            const desktopLinks = document.querySelectorAll('nav a[href^="#"]');
+            desktopLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+            
+            // Add scroll effect to navigation
+            const nav = document.getElementById('mainNav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    nav.classList.add('nav-solid');
+                    nav.classList.remove('nav-blur');
+                } else {
+                    nav.classList.add('nav-blur');
+                    nav.classList.remove('nav-solid');
+                }
+            });
+
+            // Add click handlers for all "Get Started" buttons
+            document.querySelectorAll('.start-btn, .hero-cta-primary').forEach(button => {
+                button.addEventListener('click', openApp);
+            });
+        });
     </script>
 </body>
 </html>
