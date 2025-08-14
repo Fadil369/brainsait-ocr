@@ -1,0 +1,232 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Python linting and testing
+  python-quality:
+    runs-on: ubuntu-latest
+    name: Python Code Quality
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/brainsait_ocr_requirements.txt') }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black mypy isort bandit pytest pytest-asyncio pytest-cov
+        if [ -f brainsait_ocr_requirements.txt ]; then pip install -r brainsait_ocr_requirements.txt; fi
+        
+    - name: Lint with flake8
+      run: |
+        flake8 brainsait_ocr_backend.py --max-line-length=88 --extend-ignore=E203,W503 --count --show-source --statistics
+        
+    - name: Check code formatting with Black
+      run: black --check brainsait_ocr_backend.py
+      
+    - name: Check import sorting with isort
+      run: isort --check-only brainsait_ocr_backend.py --profile=black
+      
+    - name: Type checking with mypy
+      run: mypy brainsait_ocr_backend.py --ignore-missing-imports
+      
+    - name: Security check with bandit
+      run: bandit -r . -f json -o bandit-report.json -ll
+      continue-on-error: true
+      
+    - name: Upload bandit report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bandit-report
+        path: bandit-report.json
+
+  # Python testing
+  python-tests:
+    runs-on: ubuntu-latest
+    name: Python Tests
+    needs: python-quality
+    
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio pytest-cov pytest-mock httpx fastapi
+        # Install minimal required dependencies for testing
+        pip install mistralai aiofiles langdetect click pydantic
+        
+    - name: Run unit tests
+      run: |
+        python -m pytest tests/unit/ -v --cov=brainsait_ocr_backend --cov-report=xml
+        
+    - name: Upload coverage to Codecov
+      if: matrix.python-version == '3.11'
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # JavaScript/Node.js quality and testing
+  javascript-quality:
+    runs-on: ubuntu-latest
+    name: JavaScript Code Quality
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Lint JavaScript
+      run: npx eslint src/ public/app/ --ext .js
+      
+    - name: Check code formatting
+      run: npx prettier --check "**/*.{js,json,yaml,yml,md}"
+      
+    - name: Run JavaScript tests
+      run: npm test
+      continue-on-error: true
+      
+    - name: Security audit
+      run: npm audit --audit-level=moderate
+
+  # Integration testing
+  integration-tests:
+    runs-on: ubuntu-latest
+    name: Integration Tests
+    needs: [python-tests, javascript-quality]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio httpx fastapi uvicorn
+        pip install mistralai aiofiles langdetect click pydantic
+        
+    - name: Install Node.js dependencies
+      run: npm ci
+      
+    - name: Run integration tests
+      run: python -m pytest tests/integration/ -v
+      env:
+        MISTRAL_API_KEY: test_key
+
+  # Docker build testing
+  docker-build:
+    runs-on: ubuntu-latest
+    name: Docker Build Test
+    needs: [python-tests, javascript-quality]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        tags: brainsait-ocr:test
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # Deployment (only on main branch)
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare
+    needs: [python-tests, javascript-quality, integration-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Deploy to Cloudflare Workers
+      run: npx wrangler deploy
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        
+    - name: Deploy to Cloudflare Pages
+      run: npx wrangler pages deploy ./public --project-name=brainsait-ocr
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+  # Create release (only on tags)
+  release:
+    runs-on: ubuntu-latest
+    name: Create Release
+    needs: [python-tests, javascript-quality, integration-tests]
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false

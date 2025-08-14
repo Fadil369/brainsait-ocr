@@ -15,18 +15,20 @@
   },
   "dependencies": {
     "@cloudflare/ai": "^1.0.0",
-    "hono": "^3.11.0",
+    "hono": "^4.9.1",
     "jose": "^5.1.0",
     "stripe": "^14.0.0",
     "uuid": "^9.0.0",
     "bcryptjs": "^2.4.3"
   },
   "devDependencies": {
-    "wrangler": "^3.22.0",
+    "wrangler": "^4.30.0",
     "@cloudflare/workers-types": "^4.0.0",
     "prettier": "^3.1.0",
     "jest": "^29.0.0",
-    "miniflare": "^3.0.0"
+    "miniflare": "^3.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0"
   },
   "engines": {
     "node": ">=18.0.0"
