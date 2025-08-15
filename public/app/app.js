@@ -1,3 +1,13 @@
+// Helper function to escape HTML meta-characters
+function escapeHTML(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 // BrainSAIT OCR App
 class BrainSAITApp {
     constructor() {
@@ -311,7 +321,7 @@ class BrainSAITApp {
                     </svg>
                 </div>
                 <div>
-                    <p class="text-white font-medium">${file.name}</p>
+                    <p class="text-white font-medium">${escapeHTML(file.name)}</p>
                     <p class="text-purple-200 text-sm">${this.formatFileSize(file.size)}</p>
                 </div>
             </div>
