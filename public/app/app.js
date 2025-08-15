@@ -531,16 +531,25 @@ class BrainSAITApp {
                         type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
         notification.classList.add(bgColor);
         
-        notification.innerHTML = `
-            <div class="flex items-start space-x-3">
-                <span class="text-white flex-1">${message}</span>
-                <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 flex-shrink-0">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </button>
-            </div>
+        // Build notification content safely
+        const contentDiv = document.createElement('div');
+        contentDiv.className = "flex items-start space-x-3";
+        const messageSpan = document.createElement('span');
+        messageSpan.className = "text-white flex-1";
+        messageSpan.textContent = message; // Safe: escapes HTML
+        const closeButton = document.createElement('button');
+        closeButton.className = "text-white hover:text-gray-200 flex-shrink-0";
+        closeButton.innerHTML = `
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
         `;
+        closeButton.onclick = function() {
+            notification.remove();
+        };
+        contentDiv.appendChild(messageSpan);
+        contentDiv.appendChild(closeButton);
+        notification.appendChild(contentDiv);
         
         document.body.appendChild(notification);
         
