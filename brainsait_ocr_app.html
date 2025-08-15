@@ -485,6 +485,16 @@
             }
         }
 
+        // Escape HTML meta-characters to prevent XSS
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function addFileToQueue(file, index, status) {
             const queueElement = document.getElementById('fileQueue');
             const fileDiv = document.createElement('div');
@@ -499,7 +509,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-white font-medium">${file.name}</p>
+                        <p class="text-white font-medium">${escapeHtml(file.name)}</p>
                         <p class="text-purple-200 text-sm">${formatFileSize(file.size)}</p>
                     </div>
                 </div>
