@@ -1,6 +1,6 @@
 {
   "name": "brainsait-ocr",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "BrainSAIT OCR - Advanced Multilingual Document Reader",
   "private": true,
   "scripts": {
