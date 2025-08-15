@@ -1,47 +1,28 @@
-# Multi-stage build for BrainSAIT OCR
-FROM node:18-alpine AS base
+# Simple Node.js container for BrainSAIT OCR
+FROM node:18-alpine
 
-# Install dependencies only when needed
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+# Install curl for health checks
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm ci --only=production
 
-# Development image with all dependencies
-FROM base AS dev-deps  
-WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-# Build stage
-FROM base AS builder
-WORKDIR /app
-COPY --from=dev-deps /app/node_modules ./node_modules
-COPY . .
-
-# Build the application
-RUN npm run build
-
-# Production image
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
+# Copy application files
+COPY src/ ./src/
+COPY public/ ./public/
+COPY wrangler.toml schema.sql ./
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 brainsait
+RUN addgroup -g 1001 -S brainsait && \
+    adduser -S brainsait -u 1001 -G brainsait
 
-# Copy necessary files
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder --chown=brainsait:nodejs /app/src ./src
-COPY --from=builder --chown=brainsait:nodejs /app/public ./public
-COPY --chown=brainsait:nodejs package.json ./
-COPY --chown=brainsait:nodejs wrangler.toml ./
-COPY --chown=brainsait:nodejs schema.sql ./
+# Change ownership
+RUN chown -R brainsait:brainsait /app
 
 USER brainsait
 
