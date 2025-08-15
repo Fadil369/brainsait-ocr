@@ -61,7 +61,7 @@ paymentRoutes.post('/create-session', async (c) => {
     const response = await fetch(`${PAYMENT_GATEWAYS.moyasar.baseUrl}/payments`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(PAYMENT_GATEWAYS.moyasar.secretKey + ':')}`,
+        'Authorization': `Basic ${btoa(`${PAYMENT_GATEWAYS.moyasar.secretKey  }:`)}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -74,7 +74,7 @@ paymentRoutes.post('/create-session', async (c) => {
         },
         metadata: {
           user_id: userId,
-          tier: tier,
+          tier,
           order_id: orderId
         }
       })
@@ -91,7 +91,7 @@ paymentRoutes.post('/create-session', async (c) => {
     return c.json({
       success: true,
       paymentUrl: payment.url,
-      orderId: orderId
+      orderId
     });
   } catch (error) {
     console.error('Payment creation error:', error);
@@ -107,7 +107,7 @@ paymentRoutes.post('/callback', async (c) => {
     // Verify payment with Moyasar
     const response = await fetch(`${PAYMENT_GATEWAYS.moyasar.baseUrl}/payments/${id}`, {
       headers: {
-        'Authorization': `Basic ${btoa(PAYMENT_GATEWAYS.moyasar.secretKey + ':')}`
+        'Authorization': `Basic ${btoa(`${PAYMENT_GATEWAYS.moyasar.secretKey  }:`)}`
       }
     });
     

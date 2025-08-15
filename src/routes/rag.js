@@ -265,7 +265,7 @@ async function generateEmbedding(text, env) {
   if (env.AI) {
     try {
       const response = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
-        text: text
+        text
       });
       return JSON.stringify(response.data[0]);
     } catch (error) {

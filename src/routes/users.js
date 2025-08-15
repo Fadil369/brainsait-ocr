@@ -120,8 +120,8 @@ userRoutes.post('/api-keys', async (c) => {
     
     return c.json({
       success: true,
-      apiKey: apiKey, // Only returned once
-      keyId: keyId,
+      apiKey, // Only returned once
+      keyId,
       message: 'Save this key securely. It won\'t be shown again.'
     });
     
@@ -162,11 +162,11 @@ userRoutes.get('/usage', async (c) => {
   const { period = 'month' } = c.req.query();
   
   try {
-    let dateFilter = "datetime('now', '-1 month')";
+    let dateFilter = 'datetime(\'now\', \'-1 month\')';
     if (period === 'week') {
-      dateFilter = "datetime('now', '-7 days')";
+      dateFilter = 'datetime(\'now\', \'-7 days\')';
     } else if (period === 'year') {
-      dateFilter = "datetime('now', '-1 year')";
+      dateFilter = 'datetime(\'now\', \'-1 year\')';
     }
     
     // Get usage by day

@@ -57,10 +57,10 @@ app.get('/health', (c) => {
 // Scheduled tasks (cron)
 export async function scheduled(event, env, ctx) {
   switch (event.cron) {
-    case "0 */6 * * *":
-      // Clean up old cache entries every 6 hours
-      await cleanupCache(env);
-      break;
+  case '0 */6 * * *':
+    // Clean up old cache entries every 6 hours
+    await cleanupCache(env);
+    break;
   }
 }
 

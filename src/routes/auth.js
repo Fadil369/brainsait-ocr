@@ -206,7 +206,7 @@ authRoutes.post('/reset-password', async (c) => {
     }
     
     // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await hashPassword(newPassword);
     
     // Update password and clear reset token
     await c.env.DB.prepare(
