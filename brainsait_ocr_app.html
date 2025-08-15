@@ -296,25 +296,86 @@
         };
 
         // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializeApp();
             setupEventListeners();
-            loadSavedApiKey();
+            await loadSavedApiKey();
         });
 
-        function initializeApp() {
+        // Helper functions for encryption/decryption using Web Crypto API
+        // NOTE: In a real app, use a user-provided passphrase. Here, we use a hardcoded key for demo.
+        const ENCRYPTION_KEY_PASSPHRASE = 'brainsait-demo-key'; // Replace with a secure method in production
+
+        async function getKey() {
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw",
+                enc.encode(ENCRYPTION_KEY_PASSPHRASE),
+                { name: "PBKDF2" },
+                false,
+                ["deriveKey"]
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: enc.encode("brainsait-salt"),
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function encryptData(data) {
+            const key = await getKey();
+            const enc = new TextEncoder();
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv },
+                key,
+                enc.encode(data)
+            );
+            // Store iv + encrypted data as base64
+            const buffer = new Uint8Array(iv.length + encrypted.byteLength);
+            buffer.set(iv, 0);
+            buffer.set(new Uint8Array(encrypted), iv.length);
+            return btoa(String.fromCharCode(...buffer));
+        }
+
+        async function decryptData(encryptedData) {
+            const key = await getKey();
+            const buffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+            const iv = buffer.slice(0, 12);
+            const data = buffer.slice(12);
+            const decrypted = await window.crypto.subtle.decrypt(
+                { name: "AES-GCM", iv },
+                key,
+                data
+            );
+            return new TextDecoder().decode(decrypted);
+        }
+
+        async function initializeApp() {
             // Check for saved API key
-            const savedKey = localStorage.getItem('mistralApiKey');
-            if (savedKey) {
-                mistralApiKey = savedKey;
-                document.getElementById('apiKey').value = savedKey;
-                showNotification('تم تحميل مفتاح API المحفوظ', 'success');
+            const savedKeyEnc = localStorage.getItem('mistralApiKey');
+            if (savedKeyEnc) {
+                try {
+                    const savedKey = await decryptData(savedKeyEnc);
+                    mistralApiKey = savedKey;
+                    document.getElementById('apiKey').value = savedKey;
+                    showNotification('تم تحميل مفتاح API المحفوظ', 'success');
+                } catch (e) {
+                    showNotification('تعذر فك تشفير مفتاح API المحفوظ', 'error');
+                }
             }
         }
 
         function setupEventListeners() {
             // API Key
-            document.getElementById('saveApiKey').addEventListener('click', saveApiKey);
+            document.getElementById('saveApiKey').addEventListener('click', function() { saveApiKey(); });
             
             // File upload
             const uploadZone = document.getElementById('uploadZone');
@@ -338,7 +399,7 @@
             document.getElementById('copyToClipboard').addEventListener('click', copyToClipboard);
         }
 
-        function saveApiKey() {
+        async function saveApiKey() {
             const apiKey = document.getElementById('apiKey').value.trim();
             if (!apiKey) {
                 showNotification('يرجى إدخال مفتاح API صحيح', 'error');
@@ -346,15 +407,25 @@
             }
             
             mistralApiKey = apiKey;
-            localStorage.setItem('mistralApiKey', apiKey);
-            showNotification('تم حفظ مفتاح API بنجاح', 'success');
+            try {
+                const encryptedKey = await encryptData(apiKey);
+                localStorage.setItem('mistralApiKey', encryptedKey);
+                showNotification('تم حفظ مفتاح API بنجاح', 'success');
+            } catch (e) {
+                showNotification('تعذر حفظ مفتاح API', 'error');
+            }
         }
 
-        function loadSavedApiKey() {
-            const savedKey = localStorage.getItem('mistralApiKey');
-            if (savedKey) {
-                mistralApiKey = savedKey;
-                document.getElementById('apiKey').value = savedKey;
+        async function loadSavedApiKey() {
+            const savedKeyEnc = localStorage.getItem('mistralApiKey');
+            if (savedKeyEnc) {
+                try {
+                    const savedKey = await decryptData(savedKeyEnc);
+                    mistralApiKey = savedKey;
+                    document.getElementById('apiKey').value = savedKey;
+                } catch (e) {
+                    // Optionally notify user
+                }
             }
         }
 
