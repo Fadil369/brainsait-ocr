@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@cloudflare/ai": "^1.0.0",
-    "hono": "^4.6.5",
+    "hono": "^4.9.7",
     "jose": "^5.1.0",
     "stripe": "^14.0.0",
     "uuid": "^9.0.0",
